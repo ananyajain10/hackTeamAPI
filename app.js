@@ -4,7 +4,13 @@ const createTeamRoute = require('./routes/registerRoute.js');
 const cors = require('cors')
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
-app.use(cors());
+const corsOptions = {
+        origin: 'http://localhost:5173', 
+        optionsSuccessStatus: 200, 
+        methods: 'POST', 
+        allowedHeaders: ['Content-Type']
+      }
+app.use(cors(corsOptions));
 const dotenv = require('dotenv');
 dotenv.config();
 
