@@ -20,5 +20,5 @@ mongoose.connect(process.env.URL)
         .then(()=> console.log("db connected"))
         .catch((err)=> console.log(err))
 
-app.use('/registerTeam', createTeamRoute);
+app.post('/registerTeam', createTeamRoute);
 app.listen(3000,() => console.log('server started'));   
