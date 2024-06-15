@@ -4,10 +4,10 @@ const createTeamRoute = require('./routes/registerRoute.js');
 const cors = require('cors')
 
 const corsOptions = {
-        origin: "https://htm-front-jvq3.vercel.app/",
-        methods: "POST",
-        credentials:true,
+        origin: "*", 
+        credentials: true
 }
+    
 app.use(cors(corsOptions));
 const dotenv = require('dotenv');
 dotenv.config();
@@ -21,3 +21,4 @@ mongoose.connect(process.env.URL)
 
 app.use('/registerTeam', createTeamRoute);
 app.listen(3000,() => console.log('server started'));   
+
