@@ -9,9 +9,15 @@ const createATeam = async (req, res) => {
     try {
         const { teamName, teamMembers } = req.body;
 
-        const teamExists = await createTeamModel.findOne({ teamName });
-        const emailExists = await createTeamModel.findOne({ "teamMembers.email": teamMembers[0].email });
+        const teamExists = await createTeamModel.findOne({teamName: teamName });
+        const member = teamMembers && teamMembers.length > 0 ? teamMembers[0] : null;
 
+        if (!member || !member.email) {
+          return res.status(400).json({ message: "Invalid team member data" });
+        }
+        const emailExists = await createTeamModel.findOne({ "teamMembers.email": member.email });
+       console.log(member.email)
+       
         if (teamExists) {
             return res.status(400).json({ message: "Team already exists" });
         }
@@ -19,16 +25,14 @@ const createATeam = async (req, res) => {
         if (emailExists) {
             return res.status(400).json({ message: "Email already exists in another team" });
         }
-
+       console.log(teamMembers);
         const teamCodeGen = crypto.randomBytes(16).toString('hex') + teamName;
-
-        const newTeam = new createTeamModel({
-            teamName,
-            teamMembers,
-            teamCodeGen
-        });
-
-        await newTeam.save();
+       
+        const newTeam = await createTeamModel.create({
+           teamName: teamName,
+           teamMembers: [{teamMemberName: member.teamMemberName, email: member.email, university: member.university}],
+           teamCodeGen: teamCodeGen
+          });
 
         const transporter = nodemailer.createTransport({
             service: "gmail",
@@ -46,7 +50,7 @@ const createATeam = async (req, res) => {
 
         const mailOptions = {
             from: process.env.EMAIL,
-            to: teamMembers[0].email,
+            to: member.email,
             subject: `Hi, you got registered`,
             text: emailContent,
         };
@@ -76,7 +80,7 @@ const joinATeam = async (req, res) => {
 
         if (!teamExists || emailExists) {
             return res.status(400).json({ message: "User exists or team does not exist" });
-        }
+        } 
 
         const newMember = {
             teamMemberName: member.teamMemberName,
